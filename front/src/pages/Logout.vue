@@ -4,8 +4,8 @@
 
 <script>
 export default {
-  created() {
-    this.$ctfnote.logout();
+  async created() {
+    await this.$ctfnote.logout();
     window.location.reload();
   }
 };
