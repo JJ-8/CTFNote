@@ -21,7 +21,7 @@
             </template>
           </div>
         </q-toolbar-title>
-        <q-btn-dropdown stretch flat :label="$ctfnote.me.username" v-if="$ctfnote.me">
+        <q-btn-dropdown stretch flat :label="$ctfnote.me.username" v-if="$ctfnote.me != null && $ctfnote.me.username != null">
           <q-list class="text-center">
             <q-item v-if="$ctfnote.isAdmin" clickable :to="{ name: 'admin' }">
               <q-item-section>
