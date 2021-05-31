@@ -89,10 +89,11 @@ class CTFNote {
   get isAdmin() {
     return this.me.roleId >= this.roles.USER_ADMIN;
   }
-  logout() {
+  async logout() {
     localStorage.removeItem("JWT");
     //cleanup Hedgedoc cookie
-    document.cookie = "connect.sid" + "=; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+    const url = process.env.CREATE_PAD_URL != null ? process.env.CREATE_PAD_URL + "/pad/logout" : "/pad/logout";;
+    await fetch(url, { credentials: "same-origin" });
     this._me = null;
   }
 

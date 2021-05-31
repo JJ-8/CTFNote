@@ -43,7 +43,7 @@ class HedgedocAuth {
 					},
 				}
 			);
-			return res.headers["set-cookie"][0].replace("HttpOnly;", "");
+			return res.headers["set-cookie"][0];
 		} catch (e) {
 			console.error(e);
 			return "";
