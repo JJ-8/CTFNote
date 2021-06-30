@@ -9,7 +9,10 @@
             </div>
           </q-card-section>
           <q-card-section>
-            <q-input filled v-model="password" label="New Password" lazy-rules required />
+            <q-input filled v-model="password" label="New Password" type="password" lazy-rules required />
+          </q-card-section>
+          <q-card-section>
+            <q-input filled v-model="passwordRepeat" label="Repeat Password" type="password" lazy-rules required />
           </q-card-section>
 
           <q-separator />
@@ -31,11 +34,16 @@ export default {
   props: { token: { type: String, default: "" } },
   data() {
     return {
-      password: ""
+      password: "",
+      passwordRepeat: ""
     };
   },
   methods: {
     async resetPassword() {
+      if (this.password != this.passwordRepeat) {
+        return this.$q.notify({ message: "Passwords do not match", type: "negative", position: "top" });
+      }
+
       const response = await this.$apollo.mutate({
         mutation: db.auth.RESET_PASSWORD,
         variables: { password: this.password, token: this.token }

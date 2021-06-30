@@ -71,6 +71,7 @@ function routes() {
         {
           path: "auth/resetPassword/:token",
           name: "resetPassword",
+          meta: { allowAnonymous: true },
           props: route => ({ token: route.params.token }),
           component: () => import("pages/ResetPassword.vue")
         },

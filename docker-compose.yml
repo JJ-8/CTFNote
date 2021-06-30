@@ -9,6 +9,7 @@ services:
       CREATE_PAD_URL: "http://hedgedoc:3000/new"
       SHOW_PAD_URL: "/"
       DATABASE_URL: "postgres://ctfnote:ctfnote@db:5432/ctfnote"
+      CMD_DB_URL: postgres://ctfnote:ctfnote@db:5432/hedgedoc #should be equal to CMD_DB_URL of the hedgedoc container
     depends_on:
       - db
   db:
