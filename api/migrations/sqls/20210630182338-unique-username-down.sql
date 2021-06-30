@@ -1,0 +1,1 @@
+ALTER TABLE ctfnote.profile DROP CONSTRAINT unique_username;

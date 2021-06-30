@@ -1,9 +1,31 @@
 import { makeWrapResolversPlugin, gql } from "graphile-utils";
 import axios from "axios";
-import savepointWrapper from "./savepointWrapper";
 import querystring from "querystring";
+import { hedgedocConnection, initdatabase } from "../db/hedgedocDB";
+import scrypt, { ScryptParams } from "scrypt-kdf";
 
 class HedgedocAuth {
+	public static async constructEmail(username: string) {
+		let domain: string;
+
+		const base = await this.baseUrl();
+
+		if (base == null) {
+			domain = `localhost.local`;
+		} else {
+			const url = new URL(base);
+
+			//if domain does not end in '.[tld]', it will be rejected
+			//so we add '.local' manually
+			if (url.hostname.split(".").length == 1) {
+				domain = `${url.hostname}.local`;
+			} else {
+				domain = url.hostname;
+			}
+		}
+		return `${username}@${domain}`;
+	}
+
 	private static async baseUrl(): Promise<string | null> {
 		let cleanUrl: string =
 			process.env.CREATE_PAD_URL || "http://hedgedoc:3000/new";
@@ -16,17 +38,7 @@ class HedgedocAuth {
 		password: string,
 		url: URL
 	): Promise<string> {
-		let domain: string;
-		//if domain does not end in '.[tld]', it will be rejected
-		//so we add '.local' manually
-		if (url.hostname.split(".").length == 1) {
-			domain = `${url.hostname}.local`;
-		} else {
-			domain = url.hostname;
-		}
-
-		const email = `${username}@${domain}`;
-
+		const email = await HedgedocAuth.constructEmail(username);
 		try {
 			const res = await axios.post(
 				url.toString(),
@@ -88,6 +100,17 @@ class HedgedocAuth {
 	}
 }
 
+const profileNameById = async function (context: any, id: number) {
+	const { pgClient } = context;
+	const {
+		rows: [r],
+	} = await pgClient.query(
+		`SELECT username FROM ctfnote.profile WHERE id = $1;`,
+		[id]
+	);
+	return r.username;
+};
+
 export default makeWrapResolversPlugin({
 	Mutation: {
 		login: {
@@ -102,7 +125,7 @@ export default makeWrapResolversPlugin({
 				context.setHeader(
 					"set-cookie",
 					await HedgedocAuth.login(
-						args.input.login,
+						await profileNameById(context, result.data.user_id),
 						args.input.password
 					)
 				);
@@ -129,6 +152,110 @@ export default makeWrapResolversPlugin({
 						args.input.password
 					)
 				);
+				return result;
+			},
+		},
+		registerWithToken: {
+			async resolve(
+				resolve: any,
+				_source,
+				args,
+				context: any,
+				_resolveInfo
+			) {
+				const result = await resolve();
+				await HedgedocAuth.register(
+					args.input.login,
+					args.input.password
+				);
+				context.setHeader(
+					"set-cookie",
+					await HedgedocAuth.login(
+						args.input.login,
+						args.input.password
+					)
+				);
+				return result;
+			},
+		},
+		resetPassword: {
+			async resolve(
+				resolve: any,
+				_source,
+				args,
+				context: any,
+				_resolveInfo
+			) {
+				const result = await resolve();
+				await initdatabase();
+
+				//get hedgedoc email
+				const hedgedocEmail = await HedgedocAuth.constructEmail(
+					await profileNameById(context, result.data.user_id)
+				);
+
+				//get new hedgedoc password
+				const hedgedocPasswordBuf = await scrypt.kdf(
+					args.input.password,
+					{
+						logN: 15,
+					} as ScryptParams
+				);
+				const hedgedocPassword = hedgedocPasswordBuf.toString("hex");
+
+				//update hegdedoc database
+				try {
+					await hedgedocConnection.query(
+						'UPDATE "Users" SET password = $2 WHERE email = $1',
+						[hedgedocEmail, hedgedocPassword]
+					);
+				} catch (error) {
+					console.error(error);
+				}
+
+				return result;
+			},
+		},
+		updateProfile: {
+			async resolve(
+				resolve: any,
+				_source,
+				args,
+				context: any,
+				_resolveInfo
+			) {
+				//first get the current name
+				const { pgClient } = context;
+				const {
+					rows: [r],
+				} = await pgClient.query(
+					`SELECT username FROM ctfnote.profile WHERE id = $1;`,
+					[args.input.id]
+				);
+				const hedgedocEmailOld = await HedgedocAuth.constructEmail(
+					r.username
+				);
+
+				//then update the username
+				const result = await resolve();
+
+				await initdatabase();
+
+				//get the new username
+				const hedgedocEmailNew = await HedgedocAuth.constructEmail(
+					args.input.patch.username
+				);
+
+				//update hegdedoc database
+				try {
+					await hedgedocConnection.query(
+						'UPDATE "Users" SET email = $2 WHERE email = $1',
+						[hedgedocEmailOld, hedgedocEmailNew]
+					);
+				} catch (error) {
+					console.error(error);
+				}
+
 				return result;
 			},
 		},

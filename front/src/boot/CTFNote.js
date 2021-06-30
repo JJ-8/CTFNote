@@ -92,7 +92,7 @@ class CTFNote {
   async logout() {
     localStorage.removeItem("JWT");
     //cleanup Hedgedoc cookie
-    const url = process.env.CREATE_PAD_URL != null ? process.env.CREATE_PAD_URL + "/pad/logout" : "/pad/logout";;
+    const url = process.env.CREATE_PAD_URL != null ? process.env.CREATE_PAD_URL + "/pad/logout" : "/pad/logout";
     await fetch(url, { credentials: "same-origin" });
     this._me = null;
   }
