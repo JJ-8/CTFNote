@@ -113,21 +113,13 @@ export default {
       });
     },
     updateRole(userId, role) {
+      let self = this;
       const performUpdate = () => {
         this.$apollo.mutate({
           mutation: db.admin.UPDATE_ROLE,
           variables: { userId, role },
           update: (store, { data: { updateUserRole } }) => {
-            const query = {
-              query: db.admin.USERS
-            };
-
-            const data = store.readQuery(query);
-            const user = data.users.nodes.find(u => u.id === userId);
-
-            user.role = updateUserRole.role;
-
-            store.writeQuery({ ...query, data });
+            self.users.find(u => u.id === userId).role = updateUserRole.role;
           }
         });
       };
@@ -168,8 +160,6 @@ export default {
       let first = rowsPerPage > MAX_PER_PAGE ? MAX_PER_PAGE : rowsPerPage;
 
       if (first == 0) first = MAX_PER_PAGE;
-
-      console.log(rowsPerPage);
 
       const offset = page * first;
 
