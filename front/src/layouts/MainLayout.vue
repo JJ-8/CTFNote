@@ -21,7 +21,7 @@
             </template>
           </div>
         </q-toolbar-title>
-        <q-btn-dropdown stretch flat :label="$ctfnote.me.username" v-if="$ctfnote.me != null && $ctfnote.me.username != null">
+        <q-btn-dropdown stretch flat :label="$ctfnote.me.username" v-if="$ctfnote.me != $ctfnote.anonymous">
           <q-list class="text-center">
             <q-item v-if="$ctfnote.isAdmin" clickable :to="{ name: 'admin' }">
               <q-item-section>
@@ -65,6 +65,7 @@
           </q-list>
         </q-btn-dropdown>
       </q-toolbar>
+      <q-linear-progress v-if="ctf && runningCtf" :color="ctfProgress > 0.95 ? 'red' : ctfProgress < 0.5 ? 'green' : 'secondary'" :value="ctfProgress"></q-linear-progress>
     </q-header>
     <q-drawer v-model="leftDrawerOpen" bordered v-if="ctf">
       <LeftMenu :ctf="ctf" />
@@ -79,12 +80,17 @@
 <script>
 import db from "src/gql";
 import LeftMenu from "components/LeftMenu.vue";
+import * as utils from "src/utils";
 
 export default {
   name: "MainLayout",
   components: { LeftMenu },
   created() {
     this.$q.dark.set(this.darkMode);
+    window.setInterval(this.updateTime, 10000);
+  },
+  destroyed() {
+    window.clearInterval(this.updateTime);
   },
   apollo: {
     ctf() {
@@ -133,6 +139,17 @@ export default {
     },
     liveMode() {
       return this.$localStorage.liveMode;
+    },
+    runningCtf() {
+      return utils.isRunningCtf(this.ctf, this.now);
+    },
+    ctfProgress() {
+      const start = new Date(this.ctf.startTime).getTime();
+      const end = new Date(this.ctf.endTime).getTime();
+      const delta = end - start;
+      const fromNow = this.now - start;
+
+      return Math.min(fromNow / delta, 1);
     }
   },
   mounted() {
@@ -228,14 +245,22 @@ export default {
       filtered.unshift({name: route.params.taskSlug, path: route.path});
       filtered.splice(3);
       this.taskHistory = filtered;
+    },
+    updateTime() {
+      this.now = Date.now();
     }
   },
   data() {
     return {
       leftDrawerOpen: false,
       subscribers: [],
-      taskHistory: []
+      taskHistory: [],
+      now: Date.now()
     };
+  },
+
+  beforeDestroy() {
+    clearInterval(this.ctfProgress)
   }
 };
 </script>
