@@ -5,6 +5,7 @@ class CTFNote {
   constructor() {
     this.roles = {
       USER_GUEST: 1,
+      USER_PAST_CTFS: 5,
       USER_MEMBER: 2,
       USER_MANAGER: 3,
       USER_ADMIN: 4
@@ -79,6 +80,9 @@ class CTFNote {
 
   get isGuest() {
     return this.me.roleId >= this.roles.USER_GUEST;
+  }
+  get isPastCtfs() {
+    return this.me.roleId >= this.roles.USER_PAST_CTFS;
   }
   get isMember() {
     return this.me.roleId >= this.roles.USER_MEMBER;
