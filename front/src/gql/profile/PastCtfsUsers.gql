@@ -1,0 +1,10 @@
+query pastCtfsUsers {
+  pastCtfsUsers {
+    nodes {
+      username
+      id
+      role
+      nodeId
+    }
+  }
+}

@@ -1,0 +1,1 @@
+DROP FUNCTION ctfnote.past_ctfs_users ();
