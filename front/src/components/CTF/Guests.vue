@@ -29,8 +29,8 @@ export default {
   },
   apollo: {
     guestUsers: {
-      query: db.profile.GUESTS,
-      update: d => d.guests.nodes
+      query: db.profile.PASTCTFS,
+      update: d => d.pastCtfsUsers.nodes
     },
     invitations: {
       query: db.invitation.ALL,
