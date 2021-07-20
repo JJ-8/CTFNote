@@ -259,5 +259,41 @@ export default makeWrapResolversPlugin({
 				return result;
 			},
 		},
+		deleteUser: {
+			async resolve(
+				resolve: any,
+				_source,
+				args,
+				context: any,
+				_resolveInfo
+			) {
+				//first get the current name
+				const { pgClient } = context;
+				const {
+					rows: [r],
+				} = await pgClient.query(
+					`SELECT username FROM ctfnote.profile WHERE id = $1;`,
+					[args.input.userId]
+				);
+				const hedgedocEmailOld = await HedgedocAuth.constructEmail(
+					r.username
+				);
+
+				const result = await resolve();
+
+				await initdatabase();
+				//update hegdedoc database
+				try {
+					await hedgedocConnection.query(
+						'DELETE FROM "Users" WHERE email = $1',
+						[hedgedocEmailOld]
+					);
+				} catch (error) {
+					console.error(error);
+				}
+
+				return result;
+			},
+		},
 	},
 });
