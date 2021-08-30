@@ -6,7 +6,7 @@ services:
     networks:
       - ctfnote
     environment:
-      REATE_PAD_URL: "https://${CMD_DOMAIN}/pad/new"
+      CREATE_PAD_URL: "https://${CMD_DOMAIN}/pad/new"
       SHOW_PAD_URL: "/"
       DATABASE_URL: "postgres://ctfnote:ctfnote@db:5432/ctfnote"
       CMD_DB_URL: postgres://ctfnote:ctfnote@db:5432/hedgedoc #should be equal to CMD_DB_URL of the hedgedoc container
