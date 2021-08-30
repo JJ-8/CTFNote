@@ -20,6 +20,8 @@ services:
       - CMD_DB_URL=postgres://ctfnote:ctfnote@db:5432/hedgedoc
       - CMD_URL_PATH=pad
       - CMD_IMAGE_UPLOAD_TYPE=filesystem
+      - CMD_DOMAIN=localhost:5000
+      - CMD_PROTOCOL_USESSL=false
     depends_on:
       - db
     restart: always

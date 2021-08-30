@@ -20,7 +20,9 @@ CTFNote is a collaborative tool aiming to help CTF teams to organise their work.
 
 ## Installation
 
-Use the provided docker configuration to deploy the project:
+First, copy `.env.example` to `.env` in the root of the project and fill in your domain and if you use SSL (HTTPS) or not.
+
+Then, use the provided docker configuration to deploy the project:
 
 ```shell
 $ docker-compose up -d

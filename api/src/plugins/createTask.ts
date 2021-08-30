@@ -41,29 +41,32 @@ export default makeExtendSchemaPlugin(build => {
     resolvers: {
       Mutation: {
         createTask: async (_query, { input: { title, description, category, flag, ctfId } }, { pgClient }, resolveInfo) => {
-          const padPath = await createPad()
-          const padUrl = `${process.env.SHOW_PAD_URL || '/'}${padPath.slice(1)}`
+          const padPath = await createPad();
 
-          return await savepointWrapper(pgClient, async () => {
-            const { rows: [newTask] } = await pgClient.query(
-              `SELECT * FROM ctfnote_private.create_task($1, $2, $3, $4, $5, $6)`,
-              [
-                title, description, category, flag, padUrl, ctfId
-              ]
-            )
-            const [row] = await resolveInfo.graphile.selectGraphQLResultFromTable(
-              sql.fragment`ctfnote.task`,
-              (tableAlias, queryBuilder) => {
-                queryBuilder.where(
-                  sql.fragment`${tableAlias}.id = ${sql.value(newTask.id)}`
-                );
-              }
-            )
-            return {
-              data: row,
-              query: build.$$isQuery,
-            };
-          })
+			return savepointWrapper(pgClient, async () => {
+				const {
+					rows: [newTask],
+				} = await pgClient.query(
+					`SELECT * FROM ctfnote_private.create_task($1, $2, $3, $4, $5, $6)`,
+					[title, description, category, flag, padPath, ctfId]
+				);
+				const [
+					row,
+				] = await resolveInfo.graphile.selectGraphQLResultFromTable(
+					sql.fragment`ctfnote.task`,
+					(tableAlias, queryBuilder) => {
+						queryBuilder.where(
+							sql.fragment`${tableAlias}.id = ${sql.value(
+								newTask.id
+							)}`
+						);
+					}
+				);
+				return {
+					data: row,
+					query: build.$$isQuery,
+				};
+			});
         },
       },
     },
