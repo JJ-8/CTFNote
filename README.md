@@ -34,6 +34,8 @@ Please note that CTFNote is only available from `127.0.0.1:8080`. Please use ngi
 
 ### nginx
 
+It is assumed that you want to serve CTFNote over HTTPS. HTTP configuration is not supported.
+
 An example configuration for `nginx` on the host looks like this:
 
 ```

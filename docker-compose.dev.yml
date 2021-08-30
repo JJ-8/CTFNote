@@ -22,6 +22,8 @@ services:
       - CMD_IMAGE_UPLOAD_TYPE=filesystem
       - CMD_DOMAIN=localhost:5000
       - CMD_PROTOCOL_USESSL=false
+      - CMD_URL_ADDPORT=false
+      - CMD_ALLOW_ORIGIN=localhost
     depends_on:
       - db
     restart: always

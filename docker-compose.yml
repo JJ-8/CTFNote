@@ -6,7 +6,7 @@ services:
     networks:
       - ctfnote
     environment:
-      CREATE_PAD_URL: "http://hedgedoc:3000/new"
+      REATE_PAD_URL: "https://${CMD_DOMAIN}/pad/new"
       SHOW_PAD_URL: "/"
       DATABASE_URL: "postgres://ctfnote:ctfnote@db:5432/ctfnote"
       CMD_DB_URL: postgres://ctfnote:ctfnote@db:5432/hedgedoc #should be equal to CMD_DB_URL of the hedgedoc container
@@ -40,7 +40,10 @@ services:
       - CMD_URL_PATH=pad
       - CMD_IMAGE_UPLOAD_TYPE=filesystem
       - CMD_DOMAIN=${CMD_DOMAIN}
-      - CMD_PROTOCOL_USESSL=${CMD_PROTOCOL_USESSL}
+      - CMD_PROTOCOL_USESSL=true
+      - CMD_URL_ADDPORT=false
+      - CMD_ALLOW_ORIGIN="localhost,${CMD_DOMAIN}"
+
     depends_on:
       - db
     restart: always
