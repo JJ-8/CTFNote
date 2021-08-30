@@ -121,7 +121,7 @@ export default {
         ts.month = 0;
         ts.year += 1;
       }
-      const date = new Date(ts.year, ts.month + 1, 1);
+      const date = new Date(ts.year, ts.month - 1, 1);
       return date.toLocaleString("default", { month: "long", year: "numeric" });
     },
     prevBtn() {
@@ -131,12 +131,13 @@ export default {
         ts.month = 11;
         ts.year -= 1;
       }
-      const date = new Date(ts.year, ts.month + 1, 1);
+      const date = new Date(ts.year, ts.month - 1, 1);
       return date.toLocaleString("default", { month: "long", year: "numeric" });
     },
     currentMonth() {
       const ts = QCalendar.parseTimestamp(this.selectedDate);
-      const date = new Date(ts.year, ts.month + 1, ts.day);
+      const date = new Date(ts.year, ts.month - 1, ts.day);
+      console.log(date)
       return date.toLocaleString("default", { month: "long", year: "numeric" });
     }
   }
