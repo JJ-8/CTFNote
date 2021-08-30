@@ -28,6 +28,8 @@ $ docker-compose up -d
 
 Then, visit 127.0.0.1 and create your first account, which will automatically be provided with admin privileges.
 
+Please note that CTFNote is only available from `127.0.0.1:8080`. Please use nginx to make it available over HTTPS.
+
 ### nginx
 
 An example configuration for `nginx` on the host looks like this:
@@ -36,14 +38,11 @@ An example configuration for `nginx` on the host looks like this:
 server {
         server_name ctfnote.my.domain;
 
-        listen 443 ssl;
-        listen [::]:443 ssl;
-
         root /var/www/html;
         index index.html;
 
         location / {
-                proxy_pass http://127.0.0.1:80/;
+                proxy_pass http://127.0.0.1:8080/;
                 proxy_http_version 1.1;
                 proxy_set_header Upgrade $http_upgrade;
                 proxy_set_header Connection $http_connection;
@@ -55,6 +54,8 @@ server {
         }
 }
 ```
+
+After deploying this configuration, run `certbot` to make it available over HTTPS. See [this article](https://www.digitalocean.com/community/tutorials/how-to-secure-nginx-with-let-s-encrypt-on-ubuntu-20-04) for more information.
 
 ## Privileges
 
