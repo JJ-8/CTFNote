@@ -21,6 +21,7 @@
             </template>
           </div>
         </q-toolbar-title>
+        <cyber-chef></cyber-chef>
         <q-btn-dropdown stretch flat :label="$ctfnote.me.username" v-if="$ctfnote.me != $ctfnote.anonymous">
           <q-list class="text-center">
             <q-item v-if="$ctfnote.isAdmin" clickable :to="{ name: 'admin' }">
@@ -81,10 +82,11 @@
 import db from "src/gql";
 import LeftMenu from "components/LeftMenu.vue";
 import * as utils from "src/utils";
+import CyberChef from '../components/CyberChef.vue';
 
 export default {
   name: "MainLayout",
-  components: { LeftMenu },
+  components: { CyberChef, LeftMenu },
   created() {
     this.$q.dark.set(this.darkMode);
     window.setInterval(this.updateTime, 10000);
