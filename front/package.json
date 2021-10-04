@@ -32,12 +32,13 @@
     "babel-runtime": "^6.26.0",
     "color-hash": "^1.0.3",
     "core-js": "^3.6.5",
-    "quasar": "^1.0.0",
+    "quasar": "^1.16.0",
     "slugify": "^1.5.0",
     "socket.io": "^2.4.0",
     "subscriptions-transport-ws": "^0.9.18",
     "vue-localstorage": "^0.6.2",
-    "websocket": "^1.0.33"
+    "websocket": "^1.0.33",
+    "winbox": "^0.2.0"
   },
   "devDependencies": {
     "@quasar/app": "^2.0.0",
