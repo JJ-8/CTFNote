@@ -14,11 +14,11 @@ updates:
     directory: "/db"
     schedule:
       interval: "weekly"
-- package-ecosystem: "docker"
+  - package-ecosystem: "docker"
     directory: "/front"
     schedule:
       interval: "weekly"
-- package-ecosystem: "docker"
+  - package-ecosystem: "docker"
     directory: "/api"
     schedule:
       interval: "weekly"
