@@ -20,7 +20,15 @@ CTFNote is a collaborative tool aiming to help CTF teams to organise their work.
 
 ## Installation
 
-First, copy `.env.example` to `.env` in the root of the project and fill in your domain and if you use SSL (HTTPS) or not.
+You have to clone the repository and initialize the submodules, since CTFNote uses [DestructiveFarm](https://github.com/DestructiveVoice/DestructiveFarm) to make Attack/Defense CTF infrastructure possible:
+
+```
+git clone https://github.com/JJ-8/CTFNote
+git submodule init
+git submodule update
+```
+
+Then, copy `.env.example` to `.env` in the root of the project and fill in the configuration.
 
 Then, use the provided docker configuration to deploy the project:
 
@@ -60,6 +68,14 @@ server {
 ```
 
 After deploying this configuration, run `certbot` to make it available over HTTPS. See [this article](https://www.digitalocean.com/community/tutorials/how-to-secure-nginx-with-let-s-encrypt-on-ubuntu-20-04) for more information.
+
+### DestructiveFarm
+
+> Exploit farm for attack-defense CTF competitions
+
+CTFNote includes a fork of a fork of [DesctructiveFarm](https://github.com/JJ-8/DestructiveFarm). This instance can be accessed via `https://your.domain.com/desctructivefarm/` and use the `DESCTRUCTIVE_FARM_PASSWORD` specified in the .env file as username and password.
+
+You can change the configuration of DestructiveFarm by directly editing `./DestructiveFarm/server/config.py`. The changes will be reflected immediately.
 
 ## Privileges
 

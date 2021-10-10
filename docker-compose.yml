@@ -51,8 +51,20 @@ services:
       - pad-uploads:/home/hackmd/app/public/uploads
     networks:
       - ctfnote
+  destructivefarm:
+    build:
+      context: "./DestructiveFarm"
+    restart: always
+    environment:
+      - SERVER_PASSWORD=${DESCTRUCTIVE_FARM_PASSWORD}
+    volumes:
+      - destructive_flags:/var/server/
+      - ./DestructiveFarm/server/config.py:/opt/server/config.py
+    networks:
+      - ctfnote
 volumes:
   ctfnote-db:
   pad-uploads:
+  destructive_flags:
 networks:
   ctfnote:
