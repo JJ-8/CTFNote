@@ -1,0 +1,7 @@
+# This directory should contain openvpn configs, but
+# you should probably not add them to the git repo.
+
+# Ignore all files in this directory, except this ignore-file
+*
+!.gitignore
+
