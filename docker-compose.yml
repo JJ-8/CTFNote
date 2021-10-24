@@ -51,6 +51,44 @@ services:
       - pad-uploads:/home/hackmd/app/public/uploads
     networks:
       - ctfnote
+
+  vpn:
+    # This container will setup an openvpn connection to the challenge infra.
+    # We'll proxy any containers that need access to the chals through
+    # this network.
+    image: dperson/openvpn-client
+    # cap_add, security_opt, and volume required for the image to function
+    cap_add:
+      - net_admin
+    networks:
+      - default
+    dns:
+      - 1.1.1.1
+      - 1.0.0.1
+    tmpfs:
+      - /run
+      - /tmp
+    networks:
+      ctfnote:
+        aliases:
+          - destructivefarm
+    security_opt:
+      - label:disable
+    stdin_open: true
+    tty: true
+    volumes:
+      - /dev/net:/dev/net:z
+    # Put .ovpn configuration file in the ./workdir/vpn directory
+      - ./workdir/vpn:/vpn
+    ports:
+      - "127.0.0.1:5000:5000"
+    entrypoint:
+      - "/sbin/tini"
+      - "--"
+      - "bash"
+      - "-c"
+      - "(ls /vpn/*.ovpn || sleep infinity) && /usr/bin/openvpn.sh"
+
   destructivefarm:
     build:
       context: "./DestructiveFarm"
@@ -60,10 +98,25 @@ services:
     volumes:
       - destructive_flags:/var/server/
       - ./DestructiveFarm/server/config.py:/opt/server/config.py
-    networks:
-      - ctfnote
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+    depends_on:
+      - vpn
+    network_mode: "service:vpn"
+    # Overwrite the entrypoint to prevent hosting the farm on all interfaces.
+    # Instead, only host on `vpn`, which will resolve to the _INTERNAL_ docker ip address.
+    #
+    # For example: inet 172.31.0.2/16 brd 172.31.255.255 scope global eth0
+    #
+    # The farm will be reachable via the following interfaces:
+    #  - localhost/TCP/5000 -> only accessible to docker host running this docker compose file.
+    #                          (I suspect this is enough for nginx/ctfnote?)
+    #
+    #  - 172.31.0.2/TCP/5000 -> accessible to the docker host and other containers in this file.
+    #
+    #
+    #  Just to be clear, `vpn` is just a dns name that resolves to a docker-internal IP. This
+    #  does not host the web server to the CTF network.
+    entrypoint: ["/opt/venv/bin/python", "-m", "flask", "run", "--host", "vpn", "--with-threads" ]
+
 volumes:
   ctfnote-db:
   pad-uploads:
