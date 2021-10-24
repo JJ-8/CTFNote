@@ -82,6 +82,12 @@ services:
       - ./workdir/vpn:/vpn
     ports:
       - "127.0.0.1:5000:5000"
+    entrypoint:
+      - "/sbin/tini"
+      - "--"
+      - "bash"
+      - "-c"
+      - "(ls /vpn/*.ovpn || sleep infinity) && /usr/bin/openvpn.sh"
 
   destructivefarm:
     build:
@@ -92,6 +98,8 @@ services:
     volumes:
       - destructive_flags:/var/server/
       - ./DestructiveFarm/server/config.py:/opt/server/config.py
+    depends_on:
+      - vpn
     network_mode: "service:vpn"
     # Overwrite the entrypoint to prevent hosting the farm on all interfaces.
     # Instead, only host on `vpn`, which will resolve to the _INTERNAL_ docker ip address.
