@@ -6,7 +6,7 @@ ARG NODE_ENV="production"
 ################################################################################
 # Build stage 1 - `yarn build`
 
-FROM node:16-alpine as builder
+FROM node:17-alpine as builder
 # Import our shared args
 ARG NODE_ENV
 
@@ -24,7 +24,7 @@ RUN yarn run build
 ################################################################################
 # Build stage 2 - COPY the relevant things (multiple steps)
 
-FROM node:16-alpine as clean
+FROM node:17-alpine as clean
 # Import our shared args
 ARG NODE_ENV
 
@@ -36,7 +36,7 @@ COPY --from=builder /app/migrations/ /app/migrations/
 ################################################################################
 # Build stage FINAL - COPY everything, once, and then do a clean `yarn install`
 
-FROM node:16-alpine
+FROM node:17-alpine
 # Import our shared args
 ARG NODE_ENV
 
