@@ -1,9 +1,9 @@
-name: "Build and push Docker images"
+name: "Bake and push Docker images"
 
 on: [workflow_dispatch]
 
 jobs:
-    build:
+    build_and_push:
         runs-on: ubuntu-latest
         steps:
             - name: Checkout
@@ -20,7 +20,24 @@ jobs:
               run: |
                   echo IMAGE_REPOSITORY=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]') >> $GITHUB_ENV
                   echo IMAGE_TAG=$(echo ${{ github.ref }} | tr '[:upper:]' '[:lower:]' | awk '{split($0,a,"/"); print a[3]}') >> $GITHUB_ENV
+            - name: Docker meta
+              id: meta
+              uses: docker/metadata-action@v4
+              with:
+                  images: |
+                      ghcr.io/${{ env.IMAGE_REPOSITORY }}
+                  tags: |
+                      type=ref,event=branch
+                      type=ref,event=pr
+                      type=semver,pattern={{version}}
+                      type=semver,pattern={{major}}.{{minor}}
+                      type=sha
+
             - name: Build and push
               uses: docker/bake-action@v2.3.0
               with:
+                  files: |
+                      ./docker-bake.hcl
+                      ${{ steps.meta.outputs.bake-file }}
                   push: true
+                  targets: build
