@@ -37,6 +37,6 @@ jobs:
               uses: docker/bake-action@v2.3.0
               with:
                   files: |
-                      ./docker-bake.hcl
+                      ./docker-compose.yml
                       ${{ steps.meta.outputs.bake-file }}
                   push: true
