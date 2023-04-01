@@ -40,4 +40,3 @@ jobs:
                       ./docker-bake.hcl
                       ${{ steps.meta.outputs.bake-file }}
                   push: true
-                  targets: build
