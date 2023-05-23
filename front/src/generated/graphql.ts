@@ -697,6 +697,7 @@ export type Mutation = {
   updateCtfSecret?: Maybe<UpdateCtfSecretPayload>;
   /** Updates a single `CtfSecret` using its globally unique id and a patch. */
   updateCtfSecretByNodeId?: Maybe<UpdateCtfSecretPayload>;
+  updateLastActive?: Maybe<UpdateLastActivePayload>;
   /** Updates a single `Profile` using a unique key and a patch. */
   updateProfile?: Maybe<UpdateProfilePayload>;
   /** Updates a single `Profile` using its globally unique id and a patch. */
@@ -861,6 +862,12 @@ export type MutationUpdateCtfSecretArgs = {
 /** The root mutation type which contains root level fields which mutate data. */
 export type MutationUpdateCtfSecretByNodeIdArgs = {
   input: UpdateCtfSecretByNodeIdInput;
+};
+
+
+/** The root mutation type which contains root level fields which mutate data. */
+export type MutationUpdateLastActiveArgs = {
+  input: UpdateLastActiveInput;
 };
 
 
@@ -1746,6 +1753,27 @@ export type UpdateCtfSecretPayloadCtfSecretEdgeArgs = {
   orderBy?: InputMaybe<Array<CtfSecretsOrderBy>>;
 };
 
+/** All input for the `updateLastActive` mutation. */
+export type UpdateLastActiveInput = {
+  /**
+   * An arbitrary string value with no semantic meaning. Will be included in the
+   * payload verbatim. May be used to track mutations by the client.
+   */
+  clientMutationId?: InputMaybe<Scalars['String']>;
+};
+
+/** The output of our `updateLastActive` mutation. */
+export type UpdateLastActivePayload = {
+  __typename?: 'UpdateLastActivePayload';
+  /**
+   * The exact same `clientMutationId` that was provided in the mutation input,
+   * unchanged and unused. May be used by a client to track mutations.
+   */
+  clientMutationId?: Maybe<Scalars['String']>;
+  /** Our root query field type. Allows us to run any query from our mutation payload. */
+  query?: Maybe<Query>;
+};
+
 /** All input for the `updateProfileByNodeId` mutation. */
 export type UpdateProfileByNodeIdInput = {
   /**
@@ -2051,7 +2079,7 @@ export type UpdateRoleForUserIdMutation = { __typename?: 'Mutation', updateUserR
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type MeQuery = { __typename?: 'Query', me?: { __typename?: 'Profile', id: number, username: string, lastactive: string, color?: string | null, description: string, role?: Role | null, nodeId: string } | null };
+export type MeQuery = { __typename?: 'Query', me?: { __typename?: 'Profile', id: number, username: string, color?: string | null, description: string, role?: Role | null, nodeId: string } | null };
 
 export type NewTokenQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -2210,6 +2238,8 @@ export type UninviteUserToCtfMutationVariables = Exact<{
 
 export type UninviteUserToCtfMutation = { __typename?: 'Mutation', deleteInvitation?: { __typename?: 'DeleteInvitationPayload', deletedInvitationNodeId?: string | null } | null };
 
+export type PublicProfileFragment = { __typename?: 'Profile', id: number, username: string, color?: string | null, description: string, role?: Role | null, nodeId: string };
+
 export type ProfileFragment = { __typename?: 'Profile', id: number, username: string, lastactive: string, color?: string | null, description: string, role?: Role | null, nodeId: string };
 
 export type UpdatePasswordMutationVariables = Exact<{
@@ -2231,7 +2261,17 @@ export type UpdateProfileMutation = { __typename?: 'Mutation', updateProfile?: {
 export type GetTeamQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetTeamQuery = { __typename?: 'Query', profiles?: { __typename?: 'ProfilesConnection', nodes: Array<{ __typename?: 'Profile', id: number, username: string, lastactive: string, color?: string | null, description: string, role?: Role | null, nodeId: string }> } | null };
+export type GetTeamQuery = { __typename?: 'Query', profiles?: { __typename?: 'ProfilesConnection', nodes: Array<{ __typename?: 'Profile', id: number, username: string, color?: string | null, description: string, role?: Role | null, nodeId: string }> } | null };
+
+export type GetTeamAdminQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetTeamAdminQuery = { __typename?: 'Query', profiles?: { __typename?: 'ProfilesConnection', nodes: Array<{ __typename?: 'Profile', id: number, username: string, lastactive: string, color?: string | null, description: string, role?: Role | null, nodeId: string }> } | null };
+
+export type SubscribeToPublicProfileSubscriptionVariables = Exact<{ [key: string]: never; }>;
+
+
+export type SubscribeToPublicProfileSubscription = { __typename?: 'Subscription', listen: { __typename?: 'ListenPayload', relatedNode?: { __typename?: 'Ctf', nodeId: string } | { __typename?: 'CtfSecret', nodeId: string } | { __typename?: 'Invitation', nodeId: string } | { __typename?: 'Profile', nodeId: string, id: number, username: string, color?: string | null, description: string, role?: Role | null } | { __typename?: 'Query', nodeId: string } | { __typename?: 'Setting', nodeId: string } | { __typename?: 'Task', nodeId: string } | { __typename?: 'WorkOnTask', nodeId: string } | null } };
 
 export type SubscribeToProfileSubscriptionVariables = Exact<{ [key: string]: never; }>;
 
@@ -2241,12 +2281,12 @@ export type SubscribeToProfileSubscription = { __typename?: 'Subscription', list
 export type SubscribeToProfileCreatedSubscriptionVariables = Exact<{ [key: string]: never; }>;
 
 
-export type SubscribeToProfileCreatedSubscription = { __typename?: 'Subscription', listen: { __typename?: 'ListenPayload', relatedNodeId?: string | null, relatedNode?: { __typename?: 'Ctf', nodeId: string } | { __typename?: 'CtfSecret', nodeId: string } | { __typename?: 'Invitation', nodeId: string } | { __typename?: 'Profile', nodeId: string, id: number, username: string, lastactive: string, color?: string | null, description: string, role?: Role | null } | { __typename?: 'Query', nodeId: string } | { __typename?: 'Setting', nodeId: string } | { __typename?: 'Task', nodeId: string } | { __typename?: 'WorkOnTask', nodeId: string } | null } };
+export type SubscribeToProfileCreatedSubscription = { __typename?: 'Subscription', listen: { __typename?: 'ListenPayload', relatedNodeId?: string | null, relatedNode?: { __typename?: 'Ctf', nodeId: string } | { __typename?: 'CtfSecret', nodeId: string } | { __typename?: 'Invitation', nodeId: string } | { __typename?: 'Profile', nodeId: string, id: number, username: string, color?: string | null, description: string, role?: Role | null } | { __typename?: 'Query', nodeId: string } | { __typename?: 'Setting', nodeId: string } | { __typename?: 'Task', nodeId: string } | { __typename?: 'WorkOnTask', nodeId: string } | null } };
 
 export type SubscribeToProfileDeletedSubscriptionVariables = Exact<{ [key: string]: never; }>;
 
 
-export type SubscribeToProfileDeletedSubscription = { __typename?: 'Subscription', listen: { __typename?: 'ListenPayload', relatedNodeId?: string | null, relatedNode?: { __typename?: 'Ctf', nodeId: string } | { __typename?: 'CtfSecret', nodeId: string } | { __typename?: 'Invitation', nodeId: string } | { __typename?: 'Profile', nodeId: string, id: number, username: string, lastactive: string, color?: string | null, description: string, role?: Role | null } | { __typename?: 'Query', nodeId: string } | { __typename?: 'Setting', nodeId: string } | { __typename?: 'Task', nodeId: string } | { __typename?: 'WorkOnTask', nodeId: string } | null } };
+export type SubscribeToProfileDeletedSubscription = { __typename?: 'Subscription', listen: { __typename?: 'ListenPayload', relatedNodeId?: string | null, relatedNode?: { __typename?: 'Ctf', nodeId: string } | { __typename?: 'CtfSecret', nodeId: string } | { __typename?: 'Invitation', nodeId: string } | { __typename?: 'Profile', nodeId: string, id: number, username: string, color?: string | null, description: string, role?: Role | null } | { __typename?: 'Query', nodeId: string } | { __typename?: 'Setting', nodeId: string } | { __typename?: 'Task', nodeId: string } | { __typename?: 'WorkOnTask', nodeId: string } | null } };
 
 export type SearchCtFsQueryVariables = Exact<{
   search: Scalars['String'];
@@ -2477,6 +2517,16 @@ export const FullCtfFragmentDoc = gql`
 ${TaskFragmentDoc}
 ${CtfSecretFragmentDoc}
 ${InvitationFragmentDoc}`;
+export const PublicProfileFragmentDoc = gql`
+    fragment PublicProfileFragment on Profile {
+  id
+  username
+  color
+  description
+  role
+  nodeId
+}
+    `;
 export const SettingsInfoFragmentDoc = gql`
     fragment SettingsInfo on Setting {
   nodeId
@@ -2651,10 +2701,10 @@ export type UpdateRoleForUserIdMutationCompositionFunctionResult = VueApolloComp
 export const MeDocument = gql`
     query Me {
   me {
-    ...ProfileFragment
+    ...PublicProfileFragment
   }
 }
-    ${ProfileFragmentDoc}`;
+    ${PublicProfileFragmentDoc}`;
 
 /**
  * __useMeQuery__
@@ -3364,11 +3414,11 @@ export const GetTeamDocument = gql`
     query getTeam {
   profiles {
     nodes {
-      ...ProfileFragment
+      ...PublicProfileFragment
     }
   }
 }
-    ${ProfileFragmentDoc}`;
+    ${PublicProfileFragmentDoc}`;
 
 /**
  * __useGetTeamQuery__
@@ -3389,6 +3439,64 @@ export function useGetTeamLazyQuery(options: VueApolloComposable.UseQueryOptions
   return VueApolloComposable.useLazyQuery<GetTeamQuery, GetTeamQueryVariables>(GetTeamDocument, {}, options);
 }
 export type GetTeamQueryCompositionFunctionResult = VueApolloComposable.UseQueryReturn<GetTeamQuery, GetTeamQueryVariables>;
+export const GetTeamAdminDocument = gql`
+    query getTeamAdmin {
+  profiles {
+    nodes {
+      ...ProfileFragment
+    }
+  }
+}
+    ${ProfileFragmentDoc}`;
+
+/**
+ * __useGetTeamAdminQuery__
+ *
+ * To run a query within a Vue component, call `useGetTeamAdminQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetTeamAdminQuery` returns an object from Apollo Client that contains result, loading and error properties
+ * you can use to render your UI.
+ *
+ * @param options that will be passed into the query, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/query.html#options;
+ *
+ * @example
+ * const { result, loading, error } = useGetTeamAdminQuery();
+ */
+export function useGetTeamAdminQuery(options: VueApolloComposable.UseQueryOptions<GetTeamAdminQuery, GetTeamAdminQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<GetTeamAdminQuery, GetTeamAdminQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<GetTeamAdminQuery, GetTeamAdminQueryVariables>> = {}) {
+  return VueApolloComposable.useQuery<GetTeamAdminQuery, GetTeamAdminQueryVariables>(GetTeamAdminDocument, {}, options);
+}
+export function useGetTeamAdminLazyQuery(options: VueApolloComposable.UseQueryOptions<GetTeamAdminQuery, GetTeamAdminQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<GetTeamAdminQuery, GetTeamAdminQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<GetTeamAdminQuery, GetTeamAdminQueryVariables>> = {}) {
+  return VueApolloComposable.useLazyQuery<GetTeamAdminQuery, GetTeamAdminQueryVariables>(GetTeamAdminDocument, {}, options);
+}
+export type GetTeamAdminQueryCompositionFunctionResult = VueApolloComposable.UseQueryReturn<GetTeamAdminQuery, GetTeamAdminQueryVariables>;
+export const SubscribeToPublicProfileDocument = gql`
+    subscription subscribeToPublicProfile {
+  listen(topic: "update:profiles") {
+    relatedNode {
+      nodeId
+      ... on Profile {
+        ...PublicProfileFragment
+      }
+    }
+  }
+}
+    ${PublicProfileFragmentDoc}`;
+
+/**
+ * __useSubscribeToPublicProfileSubscription__
+ *
+ * To run a query within a Vue component, call `useSubscribeToPublicProfileSubscription` and pass it any options that fit your needs.
+ * When your component renders, `useSubscribeToPublicProfileSubscription` returns an object from Apollo Client that contains result, loading and error properties
+ * you can use to render your UI.
+ *
+ * @param options that will be passed into the subscription, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/subscription.html#options;
+ *
+ * @example
+ * const { result, loading, error } = useSubscribeToPublicProfileSubscription();
+ */
+export function useSubscribeToPublicProfileSubscription(options: VueApolloComposable.UseSubscriptionOptions<SubscribeToPublicProfileSubscription, SubscribeToPublicProfileSubscriptionVariables> | VueCompositionApi.Ref<VueApolloComposable.UseSubscriptionOptions<SubscribeToPublicProfileSubscription, SubscribeToPublicProfileSubscriptionVariables>> | ReactiveFunction<VueApolloComposable.UseSubscriptionOptions<SubscribeToPublicProfileSubscription, SubscribeToPublicProfileSubscriptionVariables>> = {}) {
+  return VueApolloComposable.useSubscription<SubscribeToPublicProfileSubscription, SubscribeToPublicProfileSubscriptionVariables>(SubscribeToPublicProfileDocument, {}, options);
+}
+export type SubscribeToPublicProfileSubscriptionCompositionFunctionResult = VueApolloComposable.UseSubscriptionReturn<SubscribeToPublicProfileSubscription, SubscribeToPublicProfileSubscriptionVariables>;
 export const SubscribeToProfileDocument = gql`
     subscription subscribeToProfile {
   listen(topic: "update:profiles") {
@@ -3425,12 +3533,12 @@ export const SubscribeToProfileCreatedDocument = gql`
     relatedNode {
       nodeId
       ... on Profile {
-        ...ProfileFragment
+        ...PublicProfileFragment
       }
     }
   }
 }
-    ${ProfileFragmentDoc}`;
+    ${PublicProfileFragmentDoc}`;
 
 /**
  * __useSubscribeToProfileCreatedSubscription__
@@ -3455,12 +3563,12 @@ export const SubscribeToProfileDeletedDocument = gql`
     relatedNode {
       nodeId
       ... on Profile {
-        ...ProfileFragment
+        ...PublicProfileFragment
       }
     }
   }
 }
-    ${ProfileFragmentDoc}`;
+    ${PublicProfileFragmentDoc}`;
 
 /**
  * __useSubscribeToProfileDeletedSubscription__
@@ -4128,6 +4236,16 @@ export const FullCtfFragment = gql`
 ${TaskFragment}
 ${CtfSecretFragment}
 ${InvitationFragment}`;
+export const PublicProfileFragment = gql`
+    fragment PublicProfileFragment on Profile {
+  id
+  username
+  color
+  description
+  role
+  nodeId
+}
+    `;
 export const SettingsInfo = gql`
     fragment SettingsInfo on Setting {
   nodeId
@@ -4193,10 +4311,10 @@ export const UpdateRoleForUserId = gql`
 export const Me = gql`
     query Me {
   me {
-    ...ProfileFragment
+    ...PublicProfileFragment
   }
 }
-    ${ProfileFragment}`;
+    ${PublicProfileFragment}`;
 export const NewToken = gql`
     query newToken {
   newToken
@@ -4399,11 +4517,32 @@ export const GetTeam = gql`
     query getTeam {
   profiles {
     nodes {
+      ...PublicProfileFragment
+    }
+  }
+}
+    ${PublicProfileFragment}`;
+export const GetTeamAdmin = gql`
+    query getTeamAdmin {
+  profiles {
+    nodes {
       ...ProfileFragment
     }
   }
 }
     ${ProfileFragment}`;
+export const SubscribeToPublicProfile = gql`
+    subscription subscribeToPublicProfile {
+  listen(topic: "update:profiles") {
+    relatedNode {
+      nodeId
+      ... on Profile {
+        ...PublicProfileFragment
+      }
+    }
+  }
+}
+    ${PublicProfileFragment}`;
 export const SubscribeToProfile = gql`
     subscription subscribeToProfile {
   listen(topic: "update:profiles") {
@@ -4423,12 +4562,12 @@ export const SubscribeToProfileCreated = gql`
     relatedNode {
       nodeId
       ... on Profile {
-        ...ProfileFragment
+        ...PublicProfileFragment
       }
     }
   }
 }
-    ${ProfileFragment}`;
+    ${PublicProfileFragment}`;
 export const SubscribeToProfileDeleted = gql`
     subscription subscribeToProfileDeleted {
   listen(topic: "deleted:profiles") {
@@ -4436,12 +4575,12 @@ export const SubscribeToProfileDeleted = gql`
     relatedNode {
       nodeId
       ... on Profile {
-        ...ProfileFragment
+        ...PublicProfileFragment
       }
     }
   }
 }
-    ${ProfileFragment}`;
+    ${PublicProfileFragment}`;
 export const SearchCtFs = gql`
     query SearchCTFs($search: String!) {
   ctfs(filter: {title: {includesInsensitive: $search}}) {

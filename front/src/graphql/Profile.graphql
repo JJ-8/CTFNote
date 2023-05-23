@@ -1,3 +1,12 @@
+fragment PublicProfileFragment on Profile {
+  id
+  username
+  color
+  description
+  role
+  nodeId
+}
+
 fragment ProfileFragment on Profile {
   id
   username
@@ -28,7 +37,26 @@ mutation updateProfile($id: Int!, $patch: ProfilePatch!) {
 query getTeam {
   profiles {
     nodes {
+      ...PublicProfileFragment
+    }
+  }
+}
+
+query getTeamAdmin {
+  profiles {
+    nodes {
       ...ProfileFragment
+    }
+  }
+}
+
+subscription subscribeToPublicProfile {
+  listen(topic: "update:profiles") {
+    relatedNode {
+      nodeId
+      ... on Profile {
+        ...PublicProfileFragment
+      }
     }
   }
 }
@@ -43,13 +71,14 @@ subscription subscribeToProfile {
     }
   }
 }
+
 subscription subscribeToProfileCreated {
   listen(topic: "created:profiles") {
     relatedNodeId
     relatedNode {
       nodeId
       ... on Profile {
-        ...ProfileFragment
+        ...PublicProfileFragment
       }
     }
   }
@@ -61,7 +90,7 @@ subscription subscribeToProfileDeleted {
     relatedNode {
       nodeId
       ... on Profile {
-        ...ProfileFragment
+        ...PublicProfileFragment
       }
     }
   }
