@@ -1,33 +1,19 @@
 import { connectToDatabase } from "./database";
-import { PoolClient } from "pg";
 
 export interface Task {
   id: bigint;
   tags: string[] | undefined;
   title: string;
   description: string;
-  ctfId: bigint;
+  ctf_id: bigint;
   flag: string;
-}
-
-function buildTask(row: any): Task {
-  return {
-    id: row.id as bigint,
-    ctfId: row.ctf_id as bigint,
-    title: row.title as string,
-    description: row.description as string,
-    tags: undefined,
-    flag: row.flag as string,
-  };
 }
 
 export async function getTaskByCtfIdAndNameFromDatabase(
   ctfId: bigint,
-  name: string,
-  pgClient: PoolClient | null = null
-): Promise<Task | null> {
-  const useRequestClient = pgClient != null;
-  if (pgClient == null) pgClient = await connectToDatabase();
+  name: string
+): Promise<Task> {
+  const pgClient = await connectToDatabase();
 
   try {
     const query =
@@ -35,7 +21,16 @@ export async function getTaskByCtfIdAndNameFromDatabase(
     const values = [ctfId, name];
     const queryResult = await pgClient.query(query, values);
 
-    return buildTask(queryResult.rows[0]);
+    const task: Task = {
+      id: queryResult.rows[0].id as bigint,
+      ctf_id: queryResult.rows[0].ctf_id as bigint,
+      title: queryResult.rows[0].title as string,
+      description: queryResult.rows[0].description as string,
+      tags: undefined,
+      flag: queryResult.rows[0].flag as string,
+    };
+
+    return task;
   } catch (error) {
     console.error(
       "Failed to fetch CTF task from the database:",
@@ -43,45 +38,7 @@ export async function getTaskByCtfIdAndNameFromDatabase(
       ctfId,
       name
     );
-    return null;
-  } finally {
-    if (!useRequestClient) pgClient.release();
-  }
-}
-
-export async function getTaskFromId(taskId: bigint): Promise<Task | null> {
-  const pgClient = await connectToDatabase();
-
-  try {
-    const query =
-      "SELECT title, ctf_id, tsk.id, description, flag, array_agg(tag) as tags FROM ctfnote.task tsk LEFT JOIN ctfnote.assigned_tags tt ON tsk.id = tt.task_id LEFT JOIN ctfnote.tag t ON tt.tag_id = t.id WHERE tsk.id = $1 GROUP BY tsk.id LIMIT 1;";
-    const values = [taskId];
-    const queryResult = await pgClient.query(query, values);
-
-    return buildTask(queryResult.rows[0]);
-  } catch (error) {
-    console.error("Failed to get task from id:", error);
-    return null;
-  } finally {
-    pgClient.release();
-  }
-}
-
-export async function getChallengesFromDatabase(
-  ctfId: bigint
-): Promise<Task[]> {
-  const pgClient = await connectToDatabase();
-
-  try {
-    const query =
-      "SELECT title, description, tsk.id, ctf_id, flag, array_agg(tag) AS tags FROM ctfnote.task tsk LEFT JOIN ctfnote.assigned_tags tt ON tsk.id = tt.task_id LEFT JOIN ctfnote.tag t ON tt.tag_id = t.id WHERE ctf_id = $1 GROUP BY tsk.id ORDER BY title";
-    const values = [ctfId];
-    const queryResult = await pgClient.query(query, values);
-
-    return queryResult.rows;
-  } catch (error) {
-    console.error("Failed to get challenges from database:", error);
-    return [];
+    return {} as Task;
   } finally {
     pgClient.release();
   }
@@ -154,27 +111,6 @@ export async function userStopsWorkingOnTask(
       taskId
     );
     return false;
-  } finally {
-    pgClient.release();
-  }
-}
-
-export async function getUserIdsWorkingOnTask(task: Task): Promise<bigint[]> {
-  const pgClient = await connectToDatabase();
-  try {
-    const query =
-      "SELECT profile_id FROM ctfnote.work_on_task WHERE task_id = $1";
-    const values = [task.id];
-    const queryResult = await pgClient.query(query, values);
-
-    return queryResult.rows.map((row) => row.user_id as bigint);
-  } catch (error) {
-    console.error(
-      "Failed to fetch user ids working on task from the database:",
-      error,
-      task
-    );
-    return [];
   } finally {
     pgClient.release();
   }

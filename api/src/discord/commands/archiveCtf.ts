@@ -10,21 +10,20 @@ import {
 } from "discord.js";
 import { Command } from "../command";
 import { getAllCtfsFromDatabase } from "../database/ctfs";
-import { getChannelCategoriesForCtf } from "../utils/channels";
 
 async function archiveCtfLogic(
   client: Client,
   interaction: CommandInteraction
 ) {
   // Get current CTFs from the discord categorys
-  let ctfNames = await getAllCtfsFromDatabase();
-  const guild = interaction.guild;
-  if (guild == null) return;
-  ctfNames = ctfNames.filter(
-    (ctfName) => getChannelCategoriesForCtf(guild, ctfName).size !== 0
+  const ctfName = await getAllCtfsFromDatabase();
+  const ctfsInDiscord = interaction.guild?.channels.cache.filter(
+    (channel) =>
+      channel.type === ChannelType.GuildCategory &&
+      ctfName.includes(channel.name)
   );
 
-  if (ctfNames.length === 0) {
+  if (!ctfsInDiscord || ctfsInDiscord.size === 0) {
     await interaction.editReply({
       content: "No CTFs found!",
     });
@@ -32,14 +31,15 @@ async function archiveCtfLogic(
   }
 
   const buttons: ButtonBuilder[] = [];
-  for (let i = 0; i < ctfNames.length; i++) {
+
+  ctfsInDiscord.forEach((ctf) => {
     buttons.push(
       new ButtonBuilder()
-        .setCustomId(`archive-ctf-button-${ctfNames[i]}`)
-        .setLabel(ctfNames[i])
+        .setCustomId(`archive-ctf-button-${ctf.name}`)
+        .setLabel(ctf.name)
         .setStyle(ButtonStyle.Success)
     );
-  }
+  });
 
   const actionRow: any = new ActionRowBuilder().addComponents(buttons);
 
